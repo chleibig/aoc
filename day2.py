@@ -3,58 +3,55 @@ from typing import Optional, Tuple
 from util import read_file
 
 
-class Choice(Enum):
+class Shape(Enum):
     ROCK = 1
     PAPER = 2
     SCISSORS = 3
 
 
-opponent_map = {"A": Choice.ROCK, "B": Choice.PAPER, "C": Choice.SCISSORS}
-my_part_one_map = {"X": Choice.ROCK, "Y": Choice.PAPER, "Z": Choice.SCISSORS}
-my_part_two_map = {"X": 0, "Y": 3, "Z": 6}
+class Outcome(Enum):
+    LOSS = 0
+    DRAW = 3
+    WIN = 6
 
 
-def decode_my_choice(m_key: str, o_key: Optional[str] = None) -> Choice:
+opponent_shape = {"A": Shape.ROCK, "B": Shape.PAPER, "C": Shape.SCISSORS}
+
+
+def decode_my_shape(m_key: str, o_key: Optional[str] = None) -> Shape:
     if o_key is None:
-        return my_part_one_map[m_key]
-    # My choice depends on the opponents choice as I need to choose
-    # such that the desired outcome is achieved
-    desired_outcome = my_part_two_map[m_key]
-    o_choice = opponent_map[o_key]
-    m_choice = [mc for mc in Choice if score_outcome(o_choice, mc) == desired_outcome]
-    assert len(m_choice) == 1
-    return m_choice[0]
+        # My chosen shape is static
+        return {"X": Shape.ROCK, "Y": Shape.PAPER, "Z": Shape.SCISSORS}[m_key]
+    else:
+        # Brute force the play to achieve the desired outcome
+        desired_outcome = {"X": Outcome.LOSS, "Y": Outcome.DRAW, "Z": Outcome.WIN}[m_key]
+        for my_shape in Shape:
+            if play(my_shape, opponent_shape[o_key]) == desired_outcome:
+                return my_shape
 
 
-def decode_round(encoded_round: str, strategy: str) -> Tuple[Choice, Choice]:
+def decode_round(encoded_round: str, strategy: str) -> Tuple[Shape, Shape]:
     o_key, m_key = encoded_round.split(" ")
     if strategy == "part_one":
-        return opponent_map[o_key], decode_my_choice(m_key)
+        return decode_my_shape(m_key), opponent_shape[o_key]
     elif strategy == "part_two":
-        return opponent_map[o_key], decode_my_choice(m_key, o_key)
+        return decode_my_shape(m_key, o_key), opponent_shape[o_key]
     else:
         raise ValueError
 
 
-def score_outcome(opponent: Choice, me: Choice) -> int:
-    if opponent == me:
-        return 3
+def play(me: Shape, against: Shape) -> Outcome:
+    if me == against:
+        return Outcome.DRAW
     return {
-        (Choice.ROCK, Choice.PAPER): 6,
-        (Choice.ROCK, Choice.SCISSORS): 0,
-        (Choice.PAPER, Choice.ROCK): 0,
-        (Choice.PAPER, Choice.SCISSORS): 6,
-        (Choice.SCISSORS, Choice.ROCK): 6,
-        (Choice.SCISSORS, Choice.PAPER): 0,
-    }[opponent, me]
+        (Shape.SCISSORS, Shape.ROCK): Outcome.LOSS,
+        (Shape.ROCK, Shape.PAPER): Outcome.LOSS,
+        (Shape.PAPER, Shape.SCISSORS): Outcome.LOSS,
+    }.get((me, against), Outcome.WIN)
 
 
-def score_shape(me: Choice) -> int:
-    return {Choice.ROCK: 1, Choice.PAPER: 2, Choice.SCISSORS: 3}[me]
-
-
-def score_round(opponent: Choice, me: Choice) -> int:
-    return score_shape(me) + score_outcome(opponent, me)
+def score_round(me: Shape, against: Shape) -> int:
+    return me.value + play(me, against).value
 
 
 if __name__ == "__main__":
