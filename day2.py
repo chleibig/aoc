@@ -64,7 +64,7 @@ if __name__ == "__main__":
         for encoded, score in zip(["A Y", "B X", "C Z"], scores):
             assert score_round(*decode_round(encoded, strategy)) == score
 
-    rounds = read_file("input_day2.txt")
+    rounds = read_file("input/day2.txt")
     for strategy in ["part_one", "part_two"]:
         print(strategy)
         print(f"Total score is: {sum([score_round(*decode_round(r, strategy)) for r in rounds])}")

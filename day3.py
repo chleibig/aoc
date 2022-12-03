@@ -45,7 +45,7 @@ if __name__ == "__main__":
     for r, s in zip(test_rucksacks, test_scores):
         assert score_rucksack(r) == s, f"{r}, {s}"
 
-    rucksacks = read_file("input_day3.txt")
+    rucksacks = read_file("input/day3.txt")
     print(f"Total priority is {sum(score_rucksack(r) for r in rucksacks)}")
 
     print("Part two")
