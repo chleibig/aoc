@@ -16,7 +16,13 @@ def is_fully_contained(set1: Set[int], set2: Set[int]) -> bool:
     return set1.issubset(set2) or set2.issubset(set1)
 
 
+def has_overlap(set1: Set[int], set2: Set[int]) -> bool:
+    return len(set1.intersection(set2)) > 0
+
+
 if __name__ == "__main__":
     section_id_pairs = read_file("input/day4.txt")
     n_fully_contained = sum([is_fully_contained(*parse_pair(pair)) for pair in section_id_pairs])
-    print(f"There is {n_fully_contained} pairs for which one range is fully contained by the other.")
+    print(f"There are {n_fully_contained} pairs for which one range is fully contained by the other.")
+    n_overlap = sum([has_overlap(*parse_pair(pair)) for pair in section_id_pairs])
+    print(f"There are {n_overlap} pairs for which the ranges overlap.")
