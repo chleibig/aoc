@@ -34,7 +34,7 @@ def infer_filesystem(terminal_output: List[str]) -> Dict[PurePath, List[int]]:
             if "cd" in line:
                 cwd = change_dir(cwd, parse_dirname(line))
         elif "dir" in line:  #  Command output from `ls`
-            # dirs themselves are empty but need to be tracked because there size might be non-zero via sub-directories
+            # dirs themselves are empty but need to be tracked because their size might be non-zero via sub-directories
             filesizes_by_dirs[cwd / parse_dirname(line)].append(0)
         else:  # <filesize> <filename>
             filesizes_by_dirs[cwd].append(parse_filesize(line))
