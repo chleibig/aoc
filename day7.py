@@ -13,7 +13,7 @@ def change_dir(current_path: PurePath, to: str) -> PurePath:
 
 def parse_dirname(line: str) -> str:
     parts = line.split(" ")
-    assert len(parts) == {"$ cd":3, "dir ": 2}[line[:4]], f"Assuming directory names without whitespace, got '{line}'"
+    assert len(parts) == {"$ cd": 3, "dir ": 2}[line[:4]], f"Assuming directory names without whitespace, got '{line}'"
     return parts[-1]
 
 
@@ -58,6 +58,14 @@ def result_part_one(filesizes_by_paths) -> int:
     )
 
 
+def result_part_two(filesizes_by_dirs) -> int:
+    required_space = 30000000 - (70000000 - get_dir_size(filesizes_by_dirs, PurePath("/"), include_subdirs=True))
+    for size in sorted([get_dir_size(filesizes_by_dirs, d, True) for d in filesizes_by_dirs]):
+        if size >= required_space:
+            return size
+    raise ValueError(f"No directory found that is large enough to free up {required_space}.")
+
+
 if __name__ == "__main__":
 
     terminal_output = read_file("input/test_day7.txt")
@@ -67,7 +75,9 @@ if __name__ == "__main__":
     assert get_dir_size(filesizes_by_dirs, PurePath("/d"), True) == 24933642
     assert get_dir_size(filesizes_by_dirs, PurePath("/"), True) == 48381165
     assert result_part_one(filesizes_by_dirs) == 95437
+    assert result_part_two(filesizes_by_dirs) == 24933642
 
     terminal_output = read_file("input/day7.txt")
     filesizes_by_dirs = infer_filesystem(terminal_output)
     print(f"Part one: {result_part_one(filesizes_by_dirs)}")
+    print(f"Part two: {result_part_two(filesizes_by_dirs)}")
